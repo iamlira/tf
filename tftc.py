@@ -37,26 +37,24 @@ user_shop_info["date_min"] = user_shop_info["date"].dt.minute
 new_user_info=user_shop_info.drop(['time_stamp','date','wifi_infos'],axis=1)
 shop_set=set(new_user_info['shop_id'])
 y_=new_user_info['shop_id']
+y_=np.array(list(set(np.array(y_))))
+print(y_)
+
 new_user_info=new_user_info.drop(['shop_id'],axis=1)
-y__=pd.DataFrame([])  
-for indexs in y_.index:
-    y__[y_.loc[indexs]+'']=y_.loc[indexs]
-    s=y_.loc[indexs]+''
-    new= pd.DataFrame({s:y_.loc[indexs]},index=[0])
-    y__=y__.append(new,ignore_index=True)
-y__=np.array(y__)  
+#y__=pd.DataFrame([])  
+#for indexs in y_.index:
+#    y__[y_.loc[indexs]+'']=y_.loc[indexs]
+#    s=y_.loc[indexs]+''
+#    new= pd.DataFrame({s:y_.loc[indexs]},index=[0])
+#    y__=y__.append(new,ignore_index=True)
+#    print(len(y__))
+#y__=np.array(y__)  
 new_user_info=np.array(new_user_info)
-y_tensor=tf.constant(y__, dtype = tf.float32, shape=list(y_.shape))
+y_tensor=tf.constant(y_, dtype = tf.float32, shape=list(y_.shape))
 new_user_tensor=tf.constant(new_user_info,dtype = tf.float32, shape=list(new_user_info.shape))
 
 
-# In[ ]:
-
-
-y__
-
-
-# In[ ]:
+# In[5]:
 
 
 INPUT_NODE = 8
@@ -68,7 +66,7 @@ def get_weight_variable(shape, regularizer):
     if regularizer != None: tf.add_to_collection('losses', regularizer(weights))
     return weights
 
-
+  
 def inference(input_tensor, regularizer):
     with tf.variable_scope('layer1',reuse=tf.AUTO_REUSE):
 
@@ -84,7 +82,7 @@ def inference(input_tensor, regularizer):
     return layer2
 
 
-# In[ ]:
+# In[6]:
 
 
 BATCH_SIZE = 100
@@ -100,7 +98,7 @@ MODEL_NAME="mnist_model"
 def train(new_user_tensor,y_tensor):
 
     x = tf.placeholder(tf.float32, [None, INPUT_NODE], name='x-input')
-    y_ = tf.placeholder(tf.float32, [None, OUTPUT_NODE], name='y-input')
+    y_ = tf.placeholder(tf.float32, [None,OUTPUT_NODE], name='y-input')
 
     regularizer = tf.contrib.layers.l2_regularizer(REGULARIZATION_RATE)
     y = inference(x, regularizer)
@@ -134,7 +132,7 @@ def train(new_user_tensor,y_tensor):
                 print("After %d training step(s), loss on training batch is %g." % (step, loss_value))
 
 
-# In[ ]:
+# In[7]:
 
 
 train(new_user_tensor,y_tensor)
